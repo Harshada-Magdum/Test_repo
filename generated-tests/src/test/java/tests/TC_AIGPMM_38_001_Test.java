@@ -1,59 +1,48 @@
-## TestScripts file=src/test/java/tests/TC_AIGPMM_38_001_Test.java type=SCRIPT
+=src/test/java/tests/TC_AIGPMM_38_001_Test.java type=SCRIPT
 package tests;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import pages.CartPage;
 import pages.CheckoutYourInformationPage;
-import pages.YourCartPage;
-import java.time.Duration;
-
 public class TC_AIGPMM_38_001_Test {
     private WebDriver driver;
-    private YourCartPage yourCartPage;
-    private CheckoutYourInformationPage checkoutYourInformationPage;
-    
+    private CartPage cartPage;
+    private CheckoutYourInformationPage checkoutPage;
+    private final String baseUrl = "https://www.saucedemo.com/";
+    private final String username = "standard_user";
+    private final String password = "secret_sauce";
     @BeforeClass
     public void setUp() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().window().maximize();
-        
-        // Navigate to the application login page
-        driver.get("https://www.saucedemo.com/");
-        
-        // Perform login
-        // Using placeholder login steps since test case assumes user logged in
-        driver.findElement(By.id("user-name")).sendKeys("standard_user");
-        driver.findElement(By.id("password")).sendKeys("secret_sauce");
+        driver.get(baseUrl);
+        // Login steps
+        driver.findElement(By.id("user-name")).sendKeys(username);
+        driver.findElement(By.id("password")).sendKeys(password);
         driver.findElement(By.id("login-button")).click();
-        
-        // Select one or multiple products - placeholder: select first product by clicking add to cart
-        driver.findElement(By.cssSelector(".inventory_item:first-child button")).click();
-        
-        // Navigate to Cart page
-        driver.findElement(By.id("shopping_cart_container")).click();
-        
-        yourCartPage = new YourCartPage(driver);
-        checkoutYourInformationPage = new CheckoutYourInformationPage(driver);
+        cartPage = new CartPage(driver);
+        checkoutPage = new CheckoutYourInformationPage(driver);
     }
-    
     @Test(description = "Verify navigation to Checkout: Your Information page after clicking Checkout on Your Cart page")
     public void testNavigateToCheckoutYourInformationPage() {
+        // Select products - placeholder: select first product add to cart
+        driver.findElement(By.cssSelector(".inventory_item:first-child button")).click();
+        // Click Cart icon
+        driver.findElement(By.className("shopping_cart_link")).click();
         // Click Checkout button
-        yourCartPage.clickCheckout();
-        
-        // Verify navigation to Checkout: Your Information page
-        Assert.assertTrue(checkoutYourInformationPage.isPageLoaded(), "Checkout: Your Information page did not load.");
-        
+        cartPage.clickCheckout();
+        // Verify navigation to Checkout Your Information page
+        Assert.assertTrue(checkoutPage.isPageLoaded(), "Checkout Your Information page is not loaded.");
         // Verify mandatory fields are displayed
-        Assert.assertTrue(checkoutYourInformationPage.areMandatoryFieldsDisplayed(), "Mandatory fields are not displayed on Checkout page.");
+        Assert.assertTrue(checkoutPage.areMandatoryFieldsDisplayed(), "Mandatory fields are not displayed.");
+        // Verify page header text
+        String headerText = checkoutPage.getPageHeaderText();
+        Assert.assertEquals(headerText, "Checkout: Your Information", "Page header text mismatch.");
     }
-    
     @AfterClass
     public void tearDown() {
         if (driver != null) {

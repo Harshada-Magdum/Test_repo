@@ -15,7 +15,7 @@ public class CartPage {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
-    public void clickCheckoutHarshada() {
+    public void clickCheckoutMt() {
         WebElement checkoutBtn = wait.until(ExpectedConditions.elementToBeClickable(checkoutButton));
         checkoutBtn.click();
     }
